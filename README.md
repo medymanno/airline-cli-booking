@@ -95,26 +95,6 @@ pytest airline_cli_project/tests/test_models.py -v
 pytest airline_cli_project/tests/test_booking_flow.py -v
 ```
 
-## 📂 Project Structure
-
-```
-airline_cli_project/
-├── airline_cli_project/
-│   ├── __init__.py
-│   ├── cli.py              # Main CLI entry point
-│   ├── database.py         # Database setup and session handling
-│   ├── models.py           # SQLAlchemy models (Passenger, Flight, Booking)
-│   ├── seed.py             # Seeds the database with sample data
-│   └── tests/
-│       ├── __init__.py
-│       ├── test_models.py  # Model unit tests
-│       └── test_booking_flow.py  # Integration tests
-├── airline.db              # SQLite database (auto-created)
-├── Pipfile                 # Pipenv dependencies
-├── Pipfile.lock           # Locked dependencies
-├── .gitignore             # Git ignore rules
-└── README.md              # Project documentation
-```
 
 ## 🗄️ Database Schema
 
