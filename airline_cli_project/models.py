@@ -1,7 +1,7 @@
 from sqlalchemy import Column, Integer, String, ForeignKey, DateTime
 from sqlalchemy.orm import relationship
 from airline_cli_project.database import Base
-from datetime import datetime, timezone  # updated import
+from datetime import datetime, timezone
 
 class Passenger(Base):
     __tablename__ = "passengers"
@@ -39,7 +39,7 @@ class Booking(Base):
     passenger_id = Column(Integer, ForeignKey("passengers.id"))
     flight_id = Column(Integer, ForeignKey("flights.id"))
     seat_class = Column(String)  # Economy / Business
-    booked_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))  # fixed
+    booked_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
 
     passenger = relationship("Passenger", back_populates="bookings")
     flight = relationship("Flight", back_populates="bookings")

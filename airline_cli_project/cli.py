@@ -27,51 +27,79 @@ def menu():
         else:
             print("Invalid choice. Try again.")
 
+
 def view_flights():
+    session = get_session()
     flights = session.query(Flight).all()
-    for f in flights:
-        print(f"{f.id}. {f.flight_number}: {f.origin} → {f.destination} (Seats: {f.available_seats})")
+    if flights:
+        for f in flights:
+            print(f"{f.id}. {f.flight_number}: {f.origin} → {f.destination} (Seats: {f.available_seats})")
+    else:
+        print("No flights available.")
+    session.close()
+
 
 def book_ticket():
-    passenger_id = int(input("Enter your Passenger ID: "))
-    flight_id = int(input("Enter Flight ID to book: "))
-    seat_class = input("Enter seat class (Economy/Business): ")
+    session = get_session()
+    try:
+        passenger_id = int(input("Enter your Passenger ID: "))
+        flight_id = int(input("Enter Flight ID to book: "))
+        seat_class = input("Enter seat class (Economy/Business): ")
 
-    passenger = session.query(Passenger).get(passenger_id)
-    flight = session.query(Flight).get(flight_id)
+        passenger = session.get(Passenger, passenger_id)
+        flight = session.get(Flight, flight_id)
 
-    if passenger and flight and flight.available_seats > 0:
-        booking = Booking(passenger_id=passenger.id, flight_id=flight.id, seat_class=seat_class)
-        flight.available_seats -= 1
-        session.add(booking)
-        session.commit()
-        print(f"✅ Ticket booked for {passenger.name} on {flight.flight_number} ({seat_class})")
-    else:
-        print("❌ Booking failed. Check Passenger/Flight ID or seats availability.")
+        if passenger and flight and flight.available_seats > 0:
+            booking = Booking(passenger_id=passenger.id, flight_id=flight.id, seat_class=seat_class)
+            flight.available_seats -= 1
+            session.add(booking)
+            session.commit()
+            print(f"✅ Ticket booked for {passenger.name} on {flight.flight_number} ({seat_class})")
+        else:
+            print("❌ Booking failed. Check Passenger/Flight ID or seat availability.")
+    except ValueError:
+        print("❌ Invalid input. Please enter valid IDs.")
+    finally:
+        session.close()
+
 
 def cancel_booking():
-    booking_id = int(input("Enter Booking ID to cancel: "))
-    booking = session.query(Booking).get(booking_id)
+    session = get_session()
+    try:
+        booking_id = int(input("Enter Booking ID to cancel: "))
+        booking = session.get(Booking, booking_id)
 
-    if booking:
-        flight = booking.flight
-        flight.available_seats += 1
-        session.delete(booking)
-        session.commit()
-        print(f"✅ Booking {booking_id} cancelled. Seat returned to flight {flight.flight_number}.")
-    else:
-        print("❌ Booking not found.")
+        if booking:
+            flight = booking.flight
+            flight.available_seats += 1
+            session.delete(booking)
+            session.commit()
+            print(f"✅ Booking {booking_id} cancelled. Seat returned to flight {flight.flight_number}.")
+        else:
+            print("❌ Booking not found.")
+    except ValueError:
+        print("❌ Invalid input. Please enter a valid Booking ID.")
+    finally:
+        session.close()
+
 
 def view_bookings():
-    passenger_id = int(input("Enter your Passenger ID: "))
-    bookings = session.query(Booking).filter_by(passenger_id=passenger_id).all()
+    session = get_session()
+    try:
+        passenger_id = int(input("Enter your Passenger ID: "))
+        bookings = session.query(Booking).filter_by(passenger_id=passenger_id).all()
 
-    if bookings:
-        for b in bookings:
-            print(f"Booking {b.id}: Flight {b.flight.flight_number} ({b.flight.origin} → {b.flight.destination}), "
-                  f"Class: {b.seat_class}, Date: {b.booked_at}")
-    else:
-        print("No bookings found for this passenger.")
+        if bookings:
+            for b in bookings:
+                print(f"Booking {b.id}: Flight {b.flight.flight_number} ({b.flight.origin} → {b.flight.destination}), "
+                      f"Class: {b.seat_class}, Date: {b.booked_at}")
+        else:
+            print("No bookings found for this passenger.")
+    except ValueError:
+        print("❌ Invalid input. Please enter a valid Passenger ID.")
+    finally:
+        session.close()
+
 
 if __name__ == "__main__":
     menu()

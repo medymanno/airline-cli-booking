@@ -1,23 +1,33 @@
-from airline_cli_project.models import Passenger, Flight, Booking
-from airline_cli_project.database import get_session
-
-
-# Create tables
-Base.metadata.create_all(engine)
+from airline_cli_project.database import Base, engine, get_session, init_db
+from airline_cli_project.models import Passenger, Flight
 
 def seed_data():
+    # Initialize DB tables
+    init_db()
+    session = get_session()
+
+    # Clear existing data for a fresh start
+    session.query(Passenger).delete()
+    session.query(Flight).delete()
+    session.commit()
+
     # Add passengers
-    p1 = Passenger(name="Ahmed Mohamed", email="ahmed@example.com", passport_number="A12345")
-    p2 = Passenger(name="Mary Ann", email="mary@example.com", passport_number="B67890")
+    passengers = [
+        Passenger(name="Alice Johnson", email="alice@example.com", passport_number="A1234567"),
+        Passenger(name="Bob Smith", email="bob@example.com", passport_number="B7654321"),
+    ]
 
     # Add flights
-    f1 = Flight(flight_number="KQ101", origin="Nairobi", destination="London", available_seats=3)
-    f2 = Flight(flight_number="ET202", origin="Addis Ababa", destination="Dubai", available_seats=2)
-    f3 = Flight(flight_number="EK303", origin="Nairobi", destination="New York", available_seats=1)
+    flights = [
+        Flight(flight_number="KQ101", origin="Nairobi", destination="London", available_seats=3),
+        Flight(flight_number="EK202", origin="Dubai", destination="New York", available_seats=5),
+        Flight(flight_number="ET303", origin="Addis Ababa", destination="Paris", available_seats=2),
+    ]
 
-    session.add_all([p1, p2, f1, f2, f3])
+    session.add_all(passengers + flights)
     session.commit()
-    print("✅ Database seeded successfully!")
+    session.close()
+    print("✅ Database seeded with sample passengers and flights!")
 
 if __name__ == "__main__":
     seed_data()
